@@ -4,27 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
 </head>
 <body>
     <h1>Admin Panel</h1>
+    <label for="enterKey">Enter Key:</label>
+    <input type="text" id="enterKey" placeholder="Enter Key">
 
-    <!-- Input for adding/updating data -->
-    <h3>Add or Update Data</h3>
-    <input type="text" id="keyInput" placeholder="Enter Key (e.g., message)" />
-    <input type="text" id="valueInput" placeholder="Enter Value" />
-    <button onclick="addOrUpdateData()">Add/Update</button>
+    <label for="enterValue">Enter Value:</label>
+    <input type="text" id="enterValue" placeholder="Enter Value">
 
-    <!-- Input for deleting data -->
-    <h3>Delete Data</h3>
-    <input type="text" id="deleteKeyInput" placeholder="Enter Key to Delete" />
-    <button onclick="deleteData()">Delete</button>
+    <button id="updateButton">আপডেট</button>
 
-    <!-- Display database content -->
-    <h3>Current Database Content</h3>
-    <pre id="databaseContent">Loading...</pre>
+    <script>
+      
 
-    <script src="admin.js"></script>
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
+authDomain: "website-demo-24.firebaseapp.com",
+    databaseURL: "https://website-demo-24-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "website-demo-24",
+    storageBucket: "website-demo-24.firebasestorage.app",
+    messagingSenderId: "346117554665",
+    appId: "1:346117554665:web:0c1536c7176517c8a4cb78",
+    measurementId: "G-1GSKL8WVQJ"
+  };
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Get references to the HTML elements
+        const updateButton = document.getElementById("updateButton");
+        const enterKeyInput = document.getElementById("enterKey");
+        const enterValueInput = document.getElementById("enterValue");
+
+        // Add event listener to the update button
+        updateButton.addEventListener("click", function() {
+            const enterKey = enterKeyInput.value;
+            const enterValue = enterValueInput.value;
+
+            console.log("Button clicked!");
+
+            if (enterKey && enterValue) {
+                const reference = database.ref("data/" + enterKey);
+
+                // Set the data in Firebase
+                reference.set({
+                    value: enterValue
+                }).then(() => {
+                    console.log("Data updated successfully!");
+                }).catch((error) => {
+                    console.error("Error updating data: ", error);
+                });
+            } else {
+                console.error("Enter both key and value!");
+            }
+        });
+    </script>
 </body>
 </html>
