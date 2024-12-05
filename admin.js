@@ -74,3 +74,38 @@ function displayData() {
 
 // পেজ লোড হওয়ার পর ডেটা দেখানো
 displayData();
+
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set } from "firebase/database";
+
+const firebaseConfig = {
+
+
+    apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
+
+
+    authDomain: "website-demo-24.firebaseapp.com",
+
+
+    databaseURL: "https://website-demo-24-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+
+    projectId: "website-demo-24",
+
+
+    storageBucket: "website-demo-24.firebasestorage.app",
+
+
+    messagingSenderId: "346117554665",
+
+
+    appId: "1:346117554665:web:0c1536c7176517c8a4cb78",
+
+
+    measurementId: "G-1GSKL8WVQJ"
+
+
+  };
+// Firebase অ্যাপ ইনিশিয়ালাইজ করুন
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
