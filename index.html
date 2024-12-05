@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+
+    <!-- Input for adding/updating data -->
+    <h3>Add or Update Data</h3>
+    <input type="text" id="keyInput" placeholder="Enter Key (e.g., message)" />
+    <input type="text" id="valueInput" placeholder="Enter Value" />
+    <button onclick="addOrUpdateData()">Add/Update</button>
+
+    <!-- Input for deleting data -->
+    <h3>Delete Data</h3>
+    <input type="text" id="deleteKeyInput" placeholder="Enter Key to Delete" />
+    <button onclick="deleteData()">Delete</button>
+
+    <!-- Display database content -->
+    <h3>Current Database Content</h3>
+    <pre id="databaseContent">Loading...</pre>
+
+    <script src="admin.js"></script>
+</body>
+</html>
