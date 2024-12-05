@@ -1,13 +1,35 @@
 // Firebase Configuration (আপনার Firebase প্রকল্পের কনফিগারেশন সেটিংস)
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+
+  const firebaseConfig = {
+
+
+    apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
+
+
+    authDomain: "website-demo-24.firebaseapp.com",
+
+
+    databaseURL: "https://website-demo-24-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+
+    projectId: "website-demo-24",
+
+
+    storageBucket: "website-demo-24.firebasestorage.app",
+
+
+    messagingSenderId: "346117554665",
+
+
+    appId: "1:346117554665:web:0c1536c7176517c8a4cb78",
+
+
+    measurementId: "G-1GSKL8WVQJ"
+
+
+  };
+
+
 
 // Firebase ইনিশিয়ালাইজ
 const app = firebase.initializeApp(firebaseConfig);
