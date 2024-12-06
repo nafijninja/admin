@@ -15,6 +15,9 @@
     <label for="enterValue">Enter Value:</label>
     <input type="text" id="enterValue" placeholder="Enter Value">
     <br><br>
+    <label for="uploadImage">Upload Image:</label>
+    <input type="file" id="uploadImage" accept="image/*">
+    <br><br>
     <button id="updateButton">Update Data</button>
     <button id="deleteButton">Delete Data</button>
     <br><br>
@@ -23,6 +26,7 @@
     <!-- Firebase SDK Compatibility Mode -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
 
     <script>
         // Firebase Configuration
@@ -40,18 +44,52 @@
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const storage = firebase.storage();
 
         // Status Message Element
         const statusMessage = document.getElementById("statusMessage");
 
-        // Update Data Functionality
-        document.getElementById("updateButton").addEventListener("click", function() {
+        // Upload Image and Get URL Function
+        function uploadImage(file) {
+            return new Promise((resolve, reject) => {
+                const storageRef = storage.ref('images/' + file.name);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed', 
+                    function(snapshot) {
+                        // You can show upload progress here if needed
+                    }, 
+                    function(error) {
+                        reject("Error uploading image: " + error.message);
+                    }, 
+                    function() {
+                        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                            resolve(downloadURL);
+                        });
+                    }
+                );
+            });
+        }
+
+        // Update Data with Image Functionality
+        document.getElementById("updateButton").addEventListener("click", async function() {
             const key = document.getElementById("enterKey").value;
             const value = document.getElementById("enterValue").value;
+            const imageFile = document.getElementById("uploadImage").files[0];
 
             if (key && value) {
-                const reference = database.ref("data/" + key);
-                reference.set({ value: value })
+                try {
+                    let imageUrl = null;
+
+                    if (imageFile) {
+                        imageUrl = await uploadImage(imageFile);
+                    }
+
+                    const reference = database.ref("data/" + key);
+                    reference.set({
+                        value: value,
+                        imageUrl: imageUrl || null
+                    })
                     .then(() => {
                         statusMessage.textContent = "✅ Data updated successfully!";
                         statusMessage.style.color = "green";
@@ -60,6 +98,10 @@
                         statusMessage.textContent = "❌ Error updating data: " + error.message;
                         statusMessage.style.color = "red";
                     });
+                } catch (error) {
+                    statusMessage.textContent = "❌ " + error;
+                    statusMessage.style.color = "red";
+                }
             } else {
                 statusMessage.textContent = "⚠️ Please enter both key and value.";
                 statusMessage.style.color = "orange";
@@ -87,5 +129,6 @@
             }
         });
     </script>
+
 </body>
 </html>
