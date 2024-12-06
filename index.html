@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    
-   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
-<script src="firebaseConfig.js"></script>
-    
+    <title>Firebase Admin Panel</title>
 </head>
 <body>
-    <h1>Admin Panel</h1>
+    <h1>Firebase Admin Panel</h1>
+
+    <!-- Input Fields -->
     <label for="enterKey">Enter Key:</label>
     <input type="text" id="enterKey" placeholder="Enter Key">
-
+    <br><br>
     <label for="enterValue">Enter Value:</label>
     <input type="text" id="enterValue" placeholder="Enter Value">
+    <br><br>
+    <button id="updateButton">Update Data</button>
 
-    <button id="updateButton">আপডেট</button>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
 
     <script>
-        // Firebase config
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
             authDomain: "website-demo-24.firebaseapp.com",
@@ -37,31 +38,25 @@
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Get references to the HTML elements
+        // Update Data Functionality
         const updateButton = document.getElementById("updateButton");
-        const enterKeyInput = document.getElementById("enterKey");
-        const enterValueInput = document.getElementById("enterValue");
-
-        // Add event listener to the update button
         updateButton.addEventListener("click", function() {
-            const enterKey = enterKeyInput.value;
-            const enterValue = enterValueInput.value;
+            const key = document.getElementById("enterKey").value;
+            const value = document.getElementById("enterValue").value;
 
-            console.log("Button clicked!");
-
-            if (enterKey && enterValue) {
-                const reference = database.ref("data/" + enterKey);
-
-                // Set the data in Firebase
-                reference.set({
-                    value: enterValue
-                }).then(() => {
-                    console.log("Data updated successfully!");
-                }).catch((error) => {
-                    console.error("Error updating data: ", error);
-                });
+            if (key && value) {
+                const reference = database.ref("data/" + key);
+                reference.set({ value: value })
+                    .then(() => {
+                        alert("Data updated successfully!");
+                        console.log("Data updated: ", { key, value });
+                    })
+                    .catch((error) => {
+                        alert("Error updating data!");
+                        console.error("Error: ", error);
+                    });
             } else {
-                console.error("Enter both key and value!");
+                alert("Please enter both key and value.");
             }
         });
     </script>
