@@ -85,19 +85,16 @@
                         imageUrl = await uploadImage(imageFile);
                     }
 
+                    // Check if imageUrl is null and use the value from input if necessary
                     const reference = database.ref("data/" + key);
-                    reference.set({
+                    await reference.set({
                         value: value,
-                        imageUrl: imageUrl || null
-                    })
-                    .then(() => {
-                        statusMessage.textContent = "✅ Data updated successfully!";
-                        statusMessage.style.color = "green";
-                    })
-                    .catch((error) => {
-                        statusMessage.textContent = "❌ Error updating data: " + error.message;
-                        statusMessage.style.color = "red";
+                        imageUrl: imageUrl || "No image uploaded"
                     });
+
+                    // Show status
+                    statusMessage.textContent = "✅ Data updated successfully!";
+                    statusMessage.style.color = "green";
                 } catch (error) {
                     statusMessage.textContent = "❌ " + error;
                     statusMessage.style.color = "red";
