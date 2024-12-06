@@ -8,7 +8,6 @@
 <body>
     <h1>Firebase Admin Panel</h1>
 
-    <!-- Input Fields -->
     <label for="enterKey">Enter Key:</label>
     <input type="text" id="enterKey" placeholder="Enter Key">
     <br><br>
@@ -16,6 +15,8 @@
     <input type="text" id="enterValue" placeholder="Enter Value">
     <br><br>
     <button id="updateButton">Update Data</button>
+    <br><br>
+    <p id="statusMessage" style="font-weight: bold;"></p>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
@@ -39,24 +40,25 @@
         const database = firebase.database();
 
         // Update Data Functionality
-        const updateButton = document.getElementById("updateButton");
-        updateButton.addEventListener("click", function() {
+        document.getElementById("updateButton").addEventListener("click", function() {
             const key = document.getElementById("enterKey").value;
             const value = document.getElementById("enterValue").value;
+            const statusMessage = document.getElementById("statusMessage");
 
             if (key && value) {
                 const reference = database.ref("data/" + key);
                 reference.set({ value: value })
                     .then(() => {
-                        alert("Data updated successfully!");
-                        console.log("Data updated: ", { key, value });
+                        statusMessage.textContent = "✅ Data updated successfully!";
+                        statusMessage.style.color = "green";
                     })
                     .catch((error) => {
-                        alert("Error updating data!");
-                        console.error("Error: ", error);
+                        statusMessage.textContent = "❌ Error updating data: " + error.message;
+                        statusMessage.style.color = "red";
                     });
             } else {
-                alert("Please enter both key and value.");
+                statusMessage.textContent = "⚠️ Please enter both key and value.";
+                statusMessage.style.color = "orange";
             }
         });
     </script>
