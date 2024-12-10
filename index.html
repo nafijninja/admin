@@ -123,13 +123,18 @@
                     }
 
                     // Save data to Firebase Realtime Database
+                    const timestamp = Date.now(); // Current timestamp
                     const reference = database.ref("data/" + key);
                     await reference.set({
                         value: value,
                         imageUrl: imageUrl || "No image uploaded",
                         videoUrl: videoUrl || "No video uploaded",
-                        audioUrl: audioUrl || "No audio uploaded"
+                        audioUrl: audioUrl || "No audio uploaded",
+                        lastUpdated: timestamp // Save the last updated time
                     });
+
+                    // Save global last updated timestamp
+                    await database.ref("lastUpdated").set(timestamp);
 
                     // Show success message
                     document.getElementById("statusMessage").textContent = "✅ Data added/updated successfully!";
@@ -165,4 +170,4 @@
         });
     </script>
 </body>
-</html>
+                                                                                       </html>
