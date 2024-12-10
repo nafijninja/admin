@@ -1,188 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="icon.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Admin Panel</title>
+    <link rel="icon" type="image/x-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Admin Panel</title>
+    <style>
+        /* Loader Styling */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Firebase Admin Panel</h1>
+    <h1>Firebase Admin Panel</h1>
 
+    <!-- Input Fields -->
+    <label for="enterKey">Enter Key:</label>
+    <input type="text" id="enterKey" placeholder="Enter Key">
+    <br><br>
+    <label for="enterValue">Enter Value:</label>
+    <input type="text" id="enterValue" placeholder="Enter Value">
+    <br><br>
+    <label for="uploadImage">Upload Image:</label>
+    <input type="file" id="uploadImage" accept="image/*">
+    <br><br>
+    <label for="uploadVideo">Upload Video:</label>
+    <input type="file" id="uploadVideo" accept="video/*">
+    <br><br>
+    <label for="uploadAudio">Upload Audio:</label>
+    <input type="file" id="uploadAudio" accept="audio/*">
+    <br><br>
+    <button id="updateButton">Update Data</button>
+    <p id="statusMessage" style="font-weight: bold;"></p>
 
-    <!-- Input Fields -->
-    <label for="enterKey">Enter Key:</label>
-    <input type="text" id="enterKey" placeholder="Enter Key">
-    <br><br>
-    <label for="enterValue">Enter Value:</label>
-    <input type="text" id="enterValue" placeholder="Enter Value">
-    <br><br>
-    <label for="uploadImage">Upload Image:</label>
-    <input type="file" id="uploadImage" accept="image/*">
-    <br><br>
-    <button id="updateButton">Update Data</button>
-    <button id="deleteButton">Delete Data</button>
-    <button id="deleteImageButton">Delete Image</button> <!-- Delete Image button -->
-    <br><br>
-    <p id="statusMessage" style="font-weight: bold;"></p>
+    <!-- Loader -->
+    <div id="loader">Uploading... Please wait.</div>
 
+    <!-- Firebase SDK Compatibility Mode -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-    <!-- Firebase SDK Compatibility Mode -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
+            authDomain: "website-demo-24.firebaseapp.com",
+            databaseURL: "https://website-demo-24-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "website-demo-24",
+            storageBucket: "website-demo-24.firebasestorage.app",
+            messagingSenderId: "346117554665",
+            appId: "1:346117554665:web:0c1536c7176517c8a4cb78",
+            measurementId: "G-1GSKL8WVQJ"
+        };
 
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyA8u8_i2rD6HEvU8Pi4CaZC916ny63ec3I",
-            authDomain: "website-demo-24.firebaseapp.com",
-            databaseURL: "https://website-demo-24-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "website-demo-24",
-            storageBucket: "website-demo-24.firebasestorage.app",
-            messagingSenderId: "346117554665",
-            appId: "1:346117554665:web:0c1536c7176517c8a4cb78",
-            measurementId: "G-1GSKL8WVQJ"
-        };
+        // Cloudinary API Configuration
+        const cloudinaryUrl = "https://api.cloudinary.com/v1_1/dkujoguge/upload";
+        const uploadPreset = "NAFIJ-PRO";
 
+        // Loader Element
+        const loader = document.getElementById("loader");
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const storage = firebase.storage();
+        // Function to upload any file (image, video, audio) to Cloudinary
+        function uploadToCloudinary(file, resourceType) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", uploadPreset);
 
+            // Show loader
+            loader.style.display = "block";
 
-        // Status Message Element
-        const statusMessage = document.getElementById("statusMessage");
+            return fetch(`${cloudinaryUrl}?resource_type=${resourceType}`, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = "none"; // Hide loader
+                return data.secure_url; // Return the uploaded file URL
+            })
+            .catch(error => {
+                loader.style.display = "none"; // Hide loader
+                throw new Error(`Error uploading ${resourceType}: ${error.message}`);
+            });
+        }
 
+        // Update Data with Image, Video, and Audio
+        document.getElementById("updateButton").addEventListener("click", async function() {
+            const key = document.getElementById("enterKey").value;
+            const value = document.getElementById("enterValue").value;
+            const imageFile = document.getElementById("uploadImage").files[0];
+            const videoFile = document.getElementById("uploadVideo").files[0];
+            const audioFile = document.getElementById("uploadAudio").files[0];
 
-        // Cloudinary API URL and upload preset
-        const cloudinaryUrl = "https://api.cloudinary.com/v1_1/dkujoguge/image/upload";
-        const uploadPreset = "NAFIJ-PRO"; // Cloudinary preset name
+            if (key && value) {
+                try {
+                    let imageUrl = null, videoUrl = null, audioUrl = null;
 
+                    if (imageFile) {
+                        imageUrl = await uploadToCloudinary(imageFile, "image");
+                    }
+                    if (videoFile) {
+                        videoUrl = await uploadToCloudinary(videoFile, "video");
+                    }
+                    if (audioFile) {
+                        audioUrl = await uploadToCloudinary(audioFile, "raw"); // Use "raw" for audio
+                    }
 
-        // Function to upload image to Cloudinary
-        function uploadImage(file) {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", uploadPreset);
+                    // Save data to Firebase Realtime Database
+                    const reference = database.ref("data/" + key);
+                    await reference.set({
+                        value: value,
+                        imageUrl: imageUrl || "No image uploaded",
+                        videoUrl: videoUrl || "No video uploaded",
+                        audioUrl: audioUrl || "No audio uploaded"
+                    });
 
-
-            return fetch(cloudinaryUrl, {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => data.secure_url) // Return the URL of the uploaded image
-            .catch(error => {
-                throw new Error("Error uploading image to Cloudinary: " + error.message);
-            });
-        }
-
-
-        // Update Data with Image Functionality
-        document.getElementById("updateButton").addEventListener("click", async function() {
-            const key = document.getElementById("enterKey").value;
-            const value = document.getElementById("enterValue").value;
-            const imageFile = document.getElementById("uploadImage").files[0];
-
-
-            if (key && value) {
-                try {
-                    let imageUrl = null;
-
-
-                    if (imageFile) {
-                        imageUrl = await uploadImage(imageFile); // Get the URL after image is uploaded
-                    }
-
-
-                    // Save data to Firebase Realtime Database
-                    const reference = database.ref("data/" + key);
-                    await reference.set({
-                        value: value,
-                        imageUrl: imageUrl || "No image uploaded" // Save the image URL or a default message
-                    });
-
-
-                    // Show success message
-                    statusMessage.textContent = "✅ Data updated successfully!";
-                    statusMessage.style.color = "green";
-                } catch (error) {
-                    statusMessage.textContent = "❌ " + error.message;
-                    statusMessage.style.color = "red";
-                }
-            } else {
-                statusMessage.textContent = "⚠️ Please enter both key and value.";
-                statusMessage.style.color = "orange";
-            }
-        });
-
-
-        // Delete Data Functionality
-        document.getElementById("deleteButton").addEventListener("click", function() {
-            const key = document.getElementById("enterKey").value;
-
-
-            if (key) {
-                const reference = database.ref("data/" + key);
-                reference.remove()
-                    .then(() => {
-                        statusMessage.textContent = "✅ Data deleted successfully!";
-                        statusMessage.style.color = "green";
-                    })
-                    .catch((error) => {
-                        statusMessage.textContent = "❌ Error deleting data: " + error.message;
-                        statusMessage.style.color = "red";
-                    });
-            } else {
-                statusMessage.textContent = "⚠️ Please enter a key to delete.";
-                statusMessage.style.color = "orange";
-            }
-        });
-
-
-        // Delete Image Functionality
-        document.getElementById("deleteImageButton").addEventListener("click", async function() {
-            const key = document.getElementById("enterKey").value;
-
-
-            if (key) {
-                const reference = database.ref("data/" + key);
-                try {
-                    const snapshot = await reference.once('value');
-                    const data = snapshot.val();
-                    const imageUrl = data ? data.imageUrl : null;
-
-
-                    if (imageUrl && imageUrl !== "No image uploaded") {
-                        const imageName = imageUrl.split('/').pop().split('.')[0]; // Extract image name from URL
-                        const storageRef = storage.ref('images/' + imageName);
-                        await storageRef.delete(); // Delete the image from Firebase Storage
-                    }
-
-
-                    // Remove imageUrl from Firebase Realtime Database
-                    await reference.update({
-                        imageUrl: "No image uploaded"
-                    });
-
-
-                    // Show success message
-                    statusMessage.textContent = "✅ Image deleted successfully!";
-                    statusMessage.style.color = "green";
-                } catch (error) {
-                    statusMessage.textContent = "❌ Error deleting image: " + error.message;
-                    statusMessage.style.color = "red";
-                }
-            } else {
-                statusMessage.textContent = "⚠️ Please enter a key to delete the image.";
-                statusMessage.style.color = "orange";
-            }
-        });
-    </script>
-
-
+                    // Show success message
+                    document.getElementById("statusMessage").textContent = "✅ Data updated successfully!";
+                    document.getElementById("statusMessage").style.color = "green";
+                } catch (error) {
+                    document.getElementById("statusMessage").textContent = "❌ " + error.message;
+                    document.getElementById("statusMessage").style.color = "red";
+                }
+            } else {
+                document.getElementById("statusMessage").textContent = "⚠️ Please enter both key and value.";
+                document.getElementById("statusMessage").style.color = "orange";
+            }
+        });
+    </script>
 </body>
 </html>
