@@ -17,6 +17,9 @@
             font-weight: bold;
             color: #555;
         }
+        #statusMessage {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -38,11 +41,12 @@
     <label for="uploadAudio">Upload Audio:</label>
     <input type="file" id="uploadAudio" accept="audio/*">
     <br><br>
-    <button id="updateButton">Update Data</button>
-    <p id="statusMessage" style="font-weight: bold;"></p>
+    <button id="updateButton">Add/Update Data</button>
+    <button id="deleteButton">Delete Data</button>
+    <p id="statusMessage"></p>
 
     <!-- Loader -->
-    <div id="loader">Uploading... Please wait.</div>
+    <div id="loader">Processing... Please wait.</div>
 
     <!-- Firebase SDK Compatibility Mode -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -96,7 +100,7 @@
             });
         }
 
-        // Update Data with Image, Video, and Audio
+        // Add/Update Data with Image, Video, and Audio
         document.getElementById("updateButton").addEventListener("click", async function() {
             const key = document.getElementById("enterKey").value;
             const value = document.getElementById("enterValue").value;
@@ -128,7 +132,7 @@
                     });
 
                     // Show success message
-                    document.getElementById("statusMessage").textContent = "✅ Data updated successfully!";
+                    document.getElementById("statusMessage").textContent = "✅ Data added/updated successfully!";
                     document.getElementById("statusMessage").style.color = "green";
                 } catch (error) {
                     document.getElementById("statusMessage").textContent = "❌ " + error.message;
@@ -136,6 +140,26 @@
                 }
             } else {
                 document.getElementById("statusMessage").textContent = "⚠️ Please enter both key and value.";
+                document.getElementById("statusMessage").style.color = "orange";
+            }
+        });
+
+        // Delete Data
+        document.getElementById("deleteButton").addEventListener("click", async function() {
+            const key = document.getElementById("enterKey").value;
+
+            if (key) {
+                try {
+                    const reference = database.ref("data/" + key);
+                    await reference.remove();
+                    document.getElementById("statusMessage").textContent = "✅ Data deleted successfully!";
+                    document.getElementById("statusMessage").style.color = "green";
+                } catch (error) {
+                    document.getElementById("statusMessage").textContent = "❌ " + error.message;
+                    document.getElementById("statusMessage").style.color = "red";
+                }
+            } else {
+                document.getElementById("statusMessage").textContent = "⚠️ Please enter a key to delete.";
                 document.getElementById("statusMessage").style.color = "orange";
             }
         });
